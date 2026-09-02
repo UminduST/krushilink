@@ -1,0 +1,82 @@
+# ============================================
+# KrushiLink — Cursor AI Rules
+# B2B Agricultural Supply Chain Platform
+# Sri Lanka | 2025
+# ============================================
+
+## Project Overview
+KrushiLink is a multi-tenant B2B SaaS platform that connects
+farmers and agricultural suppliers directly with retailers,
+supermarkets, and restaurants in Sri Lanka — eliminating
+middlemen and reducing post-harvest waste.
+
+## User Roles
+- farmer: Lists harvest availability, receives orders via SMS
+- retailer: Browses listings, joins demand pools, pays digitally
+- admin: Monitors platform, manages disputes, views analytics
+- logistics: Receives delivery manifests, confirms deliveries
+
+## Core Business Logic
+- Farmers list crops 3-5 days before harvest with quantity and price
+- Retailers pool orders together to meet farmer minimum order quantities
+- Platform auto-closes pools and generates logistics manifests
+- Escrow payments: held on order, released on confirmed delivery
+- Farmers receive SMS alerts (not push) — many use basic phones
+
+## Tech Stack
+
+### Frontend
+- Framework: Next.js 14 with App Router
+- Language: TypeScript strict mode always
+- Styling: Tailwind CSS
+- State: React hooks + Supabase realtime
+- Forms: react-hook-form + zod validation
+
+### Backend
+- Database: Supabase (PostgreSQL)
+- Auth: Supabase Auth with JWT roles
+- RLS: Row-Level Security always enabled
+- API: Next.js API routes + Supabase server client
+- Payments: PayHere gateway (LKR, Sri Lanka)
+- SMS: Dialog Axiata API (primary), Twilio (fallback)
+- Maps: Google Maps Distance Matrix API
+- Mobile: React Native + Expo (farmer app)
+
+## Folder Structure
+src/app/(auth)/           # login, register
+src/app/(farmer)/         # farmer portal
+src/app/(retailer)/       # retailer portal
+src/app/(admin)/          # admin portal
+src/app/(logistics)/      # logistics portal
+src/app/api/              # API routes
+src/components/ui/        # reusable components
+src/lib/supabase/         # supabase client instances
+src/lib/validations/      # zod schemas
+src/lib/types/            # TypeScript types
+src/hooks/                # custom React hooks
+
+## Database Tables
+- users: id, role, full_name, phone, district, verified_at
+- farms: id, owner_id, name, location_lat, location_lng, district, crop_types[]
+- harvest_listings: id, farm_id, crop_name, quantity_kg, base_price_lkr,
+  available_from, available_until, status, created_at
+- demand_pools: id, listing_id, district, closes_at,
+  total_committed_kg, moq_kg, status
+- pool_orders: id, pool_id, retailer_id, quantity_kg,
+  confirmed_at, payment_status
+- deliveries: id, pool_id, logistics_provider_id,
+  route_manifest (JSONB), scheduled_at, completed_at
+- transactions: id, pool_order_id, amount_lkr,
+  platform_fee_lkr, payout_status, payhere_reference
+- notifications: id, user_id, channel, message, sent_at
+
+## Code Rules
+- TypeScript strict mode always, never use 'any'
+- Functional components only, prefer Server Components
+- snake_case for DB columns, camelCase for TS variables
+- PascalCase for components, kebab-case for routes
+- Always validate inputs with Zod before DB operations
+- Never expose service_role key on the client side
+- Always handle Supabase errors explicitly
+- Check user role server-side before any data mutation
+- Write comments explaining business logic (why, not what)

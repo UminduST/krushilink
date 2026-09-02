@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+
+node_modules/
+**/node_modules/
+.next/
+**/.next/
+out/
+**/out/
+*.tsbuildinfo
+
+# Local editor and OS files
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
