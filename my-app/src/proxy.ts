@@ -25,8 +25,13 @@ export async function proxy(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
   const { pathname } = request.nextUrl
+  const isProtectedPath = pathname.startsWith('/farmer') || pathname.startsWith('/retailer')
 
-  if (!user && (pathname.startsWith('/farmer') || pathname.startsWith('/retailer'))) {
+  if (isProtectedPath) {
+    response.headers.set('Cache-Control', 'private, no-store, max-age=0, must-revalidate')
+  }
+
+  if (!user && isProtectedPath) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.searchParams.set('next', pathname)
